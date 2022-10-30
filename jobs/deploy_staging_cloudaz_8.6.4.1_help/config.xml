@@ -1,0 +1,60 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>This job assumes &lt;a href=&quot;http://nxt-build10.nextlabs.com:9031/job/destiny-Nimbus-8.6.4.1-help-SaaS&quot;&gt;destiny-Nimbus-8.6.4.1-help-SaaS&lt;/a&gt; has already been triggered - it requires the file upload2s3.properties to be present in that job&apos;s working copy&#xd;
+&lt;br&gt;&#xd;
+&lt;br&gt;This job will trigger &lt;a href=&quot;http://jenkins.platform.nextlabs.solutions:9031/job/deploy_staging_cloudaz_help/&quot;&gt;staging-S3 CloudAZ-help deployment&lt;/a&gt; job hosted in engservices-AWS account</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.disk__usage.DiskUsageProperty plugin="disk-usage@0.28"/>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <customWorkspace>D:\Jenkins\workspace\destiny-Nimbus-8.6.4.1-help-SaaS</customWorkspace>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>## This script remote-calls a job in Staging-EC2 Jenkins server to sync the help file content.
+
+PKG_DIR=$(cygpath --mixed ${WORKSPACE})
+
+VERSION_BUILD_SHORT=$(awk -F&apos;=&apos; &apos;/VERSION_BUILD_SHORT/{print $2}&apos; ${PKG_DIR}/upload2s3.properties)
+VERSION_STR=$(awk -F&apos;=&apos; &apos;/VERSION_STR/{print $2}&apos; ${PKG_DIR}/upload2s3.properties)
+
+echo &quot;INFO: VERSION_BUILD_SHORT: ${VERSION_BUILD_SHORT}&quot;
+echo &quot;INFO: VERSION_STR: ${VERSION_STR}&quot;
+echo &quot;Ver: ${VERSION_STR}-b${VERSION_BUILD_SHORT}&quot;
+
+USER=build-op
+USERTOKEN=92fb7695d17fd6bcc85a1d7ae569b28a
+STAGING_JOB_TOKEN=470DA48b3uOxciIhY54IIBxvkR9B8Ll8
+# PRODUCTION_JOB_TOKEN=8943AA71BCF83A487912599575BA1
+
+JENKINSCRUMB=$(curl -s &apos;http://build-op:92fb7695d17fd6bcc85a1d7ae569b28a@jenkins.platform.nextlabs.solutions:9031/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,&quot;:&quot;,//crumb)&apos;)
+
+BUCKET=nextlabs-rc
+UPLOADPATH=Destiny-Techpubs-Help-SaaS
+S3PATH=${BUCKET}/nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT}
+
+# Call the staging build job
+curl -X POST -H &quot;${JENKINSCRUMB}&quot; http://${USER}:${USERTOKEN}@jenkins.platform.nextlabs.solutions:9031/job/deploy_staging_cloudaz_help/buildWithParameters?token=${STAGING_JOB_TOKEN}\&amp;cause=${JOB_NAME}_b${BUILD_NUMBER}\&amp;HELPWAR_S3PATH=${S3PATH}
+
+# # Call the production build job
+# curl -X POST -H &quot;${JENKINSCRUMB}&quot; http://${USER}:${USERTOKEN}@jenkins.platform.nextlabs.solutions:9031/job/deploy_production_cloudaz_help/buildWithParameters?token=${PRODUCTION_JOB_TOKEN}\&amp;cause=${JOB_NAME}_b${BUILD_NUMBER}\&amp;HELPWAR_S3PATH=${S3PATH}
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.plugins.descriptionsetter.DescriptionSetterPublisher plugin="description-setter@1.10">
+      <regexp>^(Ver: .*)</regexp>
+      <regexpForFailed></regexpForFailed>
+      <description>\1</description>
+      <setForMatrix>false</setForMatrix>
+    </hudson.plugins.descriptionsetter.DescriptionSetterPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>

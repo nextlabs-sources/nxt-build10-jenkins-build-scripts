@@ -1,0 +1,8 @@
+<<<<<<< HEAD
+<?xml version='1.1' encoding='UTF-8'?>
+=======
+<?xml version='1.0' encoding='UTF-8'?>
+>>>>>>> a85bb67cf5566049be14459943ceff2d5649a2f4
+<hudson.plugins.perforce.PerforceToolInstallation_-DescriptorImpl plugin="perforce@1.3.36">
+  <installations/>
+</hudson.plugins.perforce.PerforceToolInstallation_-DescriptorImpl>

@@ -1,0 +1,240 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Sync &amp; Build code of Destiny Help Repo for SaaS content&#xd;
+&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;b&gt;repo&lt;/b&gt;: https://bitbucket.org/nxtlbs-devops/techpubs-destiny-help-saas&#xd;
+&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;b&gt;branch&lt;/b&gt;: Nimbus-8.1.2&#xd;
+&lt;br&gt;&#xd;
+&lt;br&gt;This job will trigger two CloudAZ-&gt;S3 deployment jobs hosted on http://jenkins.platform.nextlabs.solutions:9031</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>20</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <hudson.plugins.disk__usage.DiskUsageProperty plugin="disk-usage@0.28"/>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>git@bitbucket.org:nxtlbs-devops/techpubs-destiny-help-saas.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>origin/Nimbus-8.1.2</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions>
+      <hudson.plugins.git.extensions.impl.WipeWorkspace/>
+    </extensions>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>true</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <hudson.triggers.SCMTrigger>
+      <spec>H/5 * * * *</spec>
+      <ignorePostCommitHooks>false</ignorePostCommitHooks>
+    </hudson.triggers.SCMTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>set +x
+export NLEXTERNALDIR2=D:/P4/main_external
+export NLGITEXTERNALDIR=D:/P4/git_external
+export JAVA_HOME=$NLEXTERNALDIR2/j2sdk/jdk1.7.0_71
+
+export PUBLISH_TO_BODA=1
+
+############################
+# Clean the workspace
+############################
+git clean -fd &amp;&amp; true
+git add .
+git stash &amp;&amp; true
+git stash drop &amp;&amp; true
+############################
+
+echo
+echo &quot;################################################################################&quot;
+echo &quot;INFO: Git info about current state of Techpubs-Destiny-Help code&quot;
+git show --quiet HEAD
+echo &quot;################################################################################&quot;
+echo
+
+cd ${WORKSPACE}
+source ./setEnv
+./buildRelease
+
+awk &apos;/VERSION_BUILD_SHORT=/{print $2}&apos; build.config &gt; ${WORKSPACE}/upload2s3.properties
+awk &apos;/VERSION_STR=/{print $2}&apos;  build.config &gt;&gt; ${WORKSPACE}/upload2s3.properties
+echo
+echo &quot;################################################################################&quot;
+echo &quot;INFO: Contents of upload2s3.properties&quot;
+cat ${WORKSPACE}/upload2s3.properties
+echo &quot;################################################################################&quot;
+echo
+
+## EOF ##
+</command>
+    </hudson.tasks.Shell>
+    <hudson.plugins.descriptionsetter.DescriptionSetterBuilder plugin="description-setter@1.10">
+      <regexp>^Checking out Revision (\w{7})</regexp>
+    </hudson.plugins.descriptionsetter.DescriptionSetterBuilder>
+  </builders>
+  <publishers>
+    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@2.7.0">
+      <config>
+        <scriptFiles/>
+        <groovyScripts/>
+        <buildSteps>
+          <org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+            <results>
+              <string>SUCCESS</string>
+            </results>
+            <role>BOTH</role>
+            <executeOn>BOTH</executeOn>
+            <buildSteps>
+              <hudson.tasks.Shell>
+                <command>set +x
+export AWS_ACCESS_KEY_ID=${STAGING_AWS_ACCESS_KEY_ID} # STAGING_AWS_ACCESS_KEY_ID defined in Jenkins properties
+export AWS_SECRET_ACCESS_KEY=&quot;${STAGING_AWS_SECRET_ACCESS_KEY}&quot; # STAGING_AWS_SECRET_ACCESS_KEY defined in Jenkins properties
+
+export DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT=D:/Jenkins/workspace/source_devops-aws-scripts
+
+RETRY_COUNT=5 # Number of retry attempts to push package to S3
+OVERALL_UPLOAD_STATUS=0 # Overall status of upload of all packages
+BUCKET=nextlabs-rc
+PKG_DIR=$(cygpath --mixed ${WORKSPACE})
+
+VERSION_BUILD_SHORT=$(awk -F&apos;=&apos; &apos;/VERSION_BUILD_SHORT/{print $2}&apos; ${PKG_DIR}/upload2s3.properties)
+VERSION_STR=$(awk -F&apos;=&apos; &apos;/VERSION_STR/{print $2}&apos; ${PKG_DIR}/upload2s3.properties)
+
+echo &quot;INFO: VERSION_BUILD_SHORT: ${VERSION_BUILD_SHORT}&quot;
+echo &quot;INFO: VERSION_STR: ${VERSION_STR}&quot;
+
+echo
+echo &quot;################################################################################&quot;
+echo &quot;INFO: Files to upload in ${PKG_DIR}&quot;
+echo &quot;################################################################################&quot;
+ls -l ${PKG_DIR}/build/server/apps/help/help.war
+echo &quot;################################################################################&quot;
+echo
+
+echo
+echo &quot;################################################################################&quot;
+echo &quot;INFO: Contents of upload2s3.properties&quot;
+cat ${PKG_DIR}/upload2s3.properties
+echo &quot;################################################################################&quot;
+echo
+
+################################################################################
+##
+# Usage: checkPackageInS3 INSTALLER UPLOADPATH
+##
+checkPackageInS3 () {
+	INSTALLER=$1
+	UPLOADPATH=$2
+	PKGCOUNT=$(aws s3 ls s3://${BUCKET}/nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT}/${INSTALLER} | wc -l)
+	if [ ${PKGCOUNT} -ne 1 ] ; then
+		echo &quot;ERROR: checkPackageInS3(): Upload of ${INSTALLER} package failed.&quot;
+		OVERALL_UPLOAD_STATUS=-1
+	fi
+}
+##
+################################################################################
+
+if compgen -G &quot;${PKG_DIR}/build/server/apps/help/help.war&quot; &gt; /dev/null; then
+	FP2_SAAS_HELP_WAR=$(ls -t ${PKG_DIR}/build/server/apps/help/help.war | head -1)
+	SAAS_HELP_WAR=$(basename ${FP2_SAAS_HELP_WAR})
+	UPLOADPATH=Destiny-Techpubs-Help-SaaS
+
+	# uploadPackage2S3 ${SAAS_HELP_WAR} ${FP2_SAAS_HELP_WAR} ${UPLOADPATH}
+	echo &quot;INFO: Uploading $(basename ${FP2_SAAS_HELP_WAR}) to s3://${BUCKET}/nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT}/&quot;
+	echo python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_SAAS_HELP_WAR} numtry=${RETRY_COUNT}
+	python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_SAAS_HELP_WAR} numtry=${RETRY_COUNT} &amp;
+fi
+
+wait
+
+checkPackageInS3 ${SAAS_HELP_WAR} Destiny-Techpubs-Help-SaaS
+
+rm -f ${FP2_SAAS_HELP_WAR}
+# rm -f ${PKG_DIR}/upload2s3.properties
+
+exit ${OVERALL_UPLOAD_STATUS}
+
+## EOF ##
+</command>
+              </hudson.tasks.Shell>
+            </buildSteps>
+          </org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+          <org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+            <results>
+              <string>SUCCESS</string>
+            </results>
+            <role>BOTH</role>
+            <executeOn>BOTH</executeOn>
+            <buildSteps>
+              <hudson.tasks.Shell>
+                <command>## This script remote-calls a job in Staging-EC2 Jenkins server to sync the help file content.
+
+PKG_DIR=$(cygpath --mixed ${WORKSPACE})
+
+VERSION_BUILD_SHORT=$(awk -F&apos;=&apos; &apos;/VERSION_BUILD_SHORT/{print $2}&apos; ${PKG_DIR}/upload2s3.properties)
+VERSION_STR=$(awk -F&apos;=&apos; &apos;/VERSION_STR/{print $2}&apos; ${PKG_DIR}/upload2s3.properties)
+
+echo &quot;INFO: VERSION_BUILD_SHORT: ${VERSION_BUILD_SHORT}&quot;
+echo &quot;INFO: VERSION_STR: ${VERSION_STR}&quot;
+
+USER=build-op
+USERTOKEN=92fb7695d17fd6bcc85a1d7ae569b28a
+STAGING_JOB_TOKEN=470DA48b3uOxciIhY54IIBxvkR9B8Ll8
+PRODUCTION_JOB_TOKEN=8943AA71BCF83A487912599575BA1
+
+JENKINSCRUMB=$(curl -s &apos;http://build-op:92fb7695d17fd6bcc85a1d7ae569b28a@jenkins.platform.nextlabs.solutions:9031/crumbIssuer/api/xml?xpath=concat(//crumbRequestField,&quot;:&quot;,//crumb)&apos;)
+
+BUCKET=nextlabs-rc
+UPLOADPATH=Destiny-Techpubs-Help-SaaS
+S3PATH=${BUCKET}/nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT}
+
+# Call the staging build job
+curl -X POST -H &quot;${JENKINSCRUMB}&quot; http://${USER}:${USERTOKEN}@jenkins.platform.nextlabs.solutions:9031/job/deploy_staging_cloudaz_help/buildWithParameters?token=${STAGING_JOB_TOKEN}\&amp;cause=${JOB_NAME}_b${BUILD_NUMBER}\&amp;HELPWAR_S3PATH=${S3PATH}
+
+# Call the production build job
+curl -X POST -H &quot;${JENKINSCRUMB}&quot; http://${USER}:${USERTOKEN}@jenkins.platform.nextlabs.solutions:9031/job/deploy_production_cloudaz_help/buildWithParameters?token=${PRODUCTION_JOB_TOKEN}\&amp;cause=${JOB_NAME}_b${BUILD_NUMBER}\&amp;HELPWAR_S3PATH=${S3PATH}
+</command>
+              </hudson.tasks.Shell>
+            </buildSteps>
+          </org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+        </buildSteps>
+        <markBuildUnstable>false</markBuildUnstable>
+      </config>
+      <buildSteps>
+        <hudson.tasks.Shell reference="../../config/buildSteps/org.jenkinsci.plugins.postbuildscript.model.PostBuildStep/buildSteps/hudson.tasks.Shell"/>
+        <hudson.tasks.Shell reference="../../config/buildSteps/org.jenkinsci.plugins.postbuildscript.model.PostBuildStep[2]/buildSteps/hudson.tasks.Shell"/>
+      </buildSteps>
+      <scriptOnlyIfSuccess>true</scriptOnlyIfSuccess>
+      <scriptOnlyIfFailure>false</scriptOnlyIfFailure>
+      <markBuildUnstable>false</markBuildUnstable>
+    </org.jenkinsci.plugins.postbuildscript.PostBuildScript>
+    <hudson.tasks.Mailer plugin="mailer@1.21">
+      <recipients>hudson-build@nextlabs.com Sunil.Devarbhavi@nextlabs.com ShahNeng.Chok@nextlabs.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.10"/>
+  </buildWrappers>
+</project>

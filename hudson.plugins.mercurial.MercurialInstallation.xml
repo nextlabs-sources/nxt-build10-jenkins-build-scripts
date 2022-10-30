@@ -1,0 +1,9 @@
+<<<<<<< HEAD
+<?xml version='1.1' encoding='UTF-8'?>
+<hudson.plugins.mercurial.MercurialInstallation_-DescriptorImpl plugin="mercurial@2.4">
+=======
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson.plugins.mercurial.MercurialInstallation_-DescriptorImpl plugin="mercurial@1.59">
+>>>>>>> a85bb67cf5566049be14459943ceff2d5649a2f4
+  <installations/>
+</hudson.plugins.mercurial.MercurialInstallation_-DescriptorImpl>

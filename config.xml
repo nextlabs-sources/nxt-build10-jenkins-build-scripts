@@ -1,0 +1,373 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<hudson>
+  <disabledAdministrativeMonitors>
+    <string>hudsonHomeIsFull</string>
+  </disabledAdministrativeMonitors>
+  <version>2.157</version>
+  <installStateName>RESTART</installStateName>
+  <numExecutors>1</numExecutors>
+  <mode>NORMAL</mode>
+  <useSecurity>true</useSecurity>
+  <authorizationStrategy class="hudson.security.ProjectMatrixAuthorizationStrategy">
+    <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Create:hudson-admin</permission>
+    <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Delete:hudson-admin</permission>
+    <permission>com.cloudbees.plugins.credentials.CredentialsProvider.ManageDomains:hudson-admin</permission>
+    <permission>com.cloudbees.plugins.credentials.CredentialsProvider.Update:hudson-admin</permission>
+    <permission>com.cloudbees.plugins.credentials.CredentialsProvider.View:hudson-admin</permission>
+    <permission>hudson.model.Computer.Build:hudson-admin</permission>
+    <permission>hudson.model.Computer.Configure:hudson-admin</permission>
+    <permission>hudson.model.Computer.Connect:hudson-admin</permission>
+    <permission>hudson.model.Computer.Create:hudson-admin</permission>
+    <permission>hudson.model.Computer.Delete:hudson-admin</permission>
+    <permission>hudson.model.Computer.Disconnect:hudson-admin</permission>
+    <permission>hudson.model.Hudson.Administer:hudson-admin</permission>
+    <permission>hudson.model.Hudson.Read:hudson-admin</permission>
+    <permission>hudson.model.Hudson.Read:hudson-pcv</permission>
+    <permission>hudson.model.Hudson.Read:hudson-release</permission>
+    <permission>hudson.model.Hudson.Read:iqin</permission>
+    <permission>hudson.model.Item.Build:hudson-admin</permission>
+    <permission>hudson.model.Item.Build:hudson-pcv</permission>
+    <permission>hudson.model.Item.Build:hudson-release</permission>
+    <permission>hudson.model.Item.Cancel:hudson-admin</permission>
+    <permission>hudson.model.Item.Cancel:hudson-pcv</permission>
+    <permission>hudson.model.Item.Cancel:hudson-release</permission>
+    <permission>hudson.model.Item.Configure:hudson-admin</permission>
+    <permission>hudson.model.Item.Create:hudson-admin</permission>
+    <permission>hudson.model.Item.Delete:hudson-admin</permission>
+    <permission>hudson.model.Item.Discover:anonymous</permission>
+    <permission>hudson.model.Item.Discover:hudson-admin</permission>
+    <permission>hudson.model.Item.Discover:hudson-pcv</permission>
+    <permission>hudson.model.Item.Discover:hudson-release</permission>
+    <permission>hudson.model.Item.Move:hudson-admin</permission>
+    <permission>hudson.model.Item.Read:anonymous</permission>
+    <permission>hudson.model.Item.Read:hudson-admin</permission>
+    <permission>hudson.model.Item.Read:hudson-pcv</permission>
+    <permission>hudson.model.Item.Read:hudson-release</permission>
+    <permission>hudson.model.Item.Workspace:anonymous</permission>
+    <permission>hudson.model.Item.Workspace:hudson-admin</permission>
+    <permission>hudson.model.Item.Workspace:hudson-pcv</permission>
+    <permission>hudson.model.Item.Workspace:hudson-release</permission>
+    <permission>hudson.model.Run.Delete:hudson-admin</permission>
+    <permission>hudson.model.Run.Replay:hudson-admin</permission>
+    <permission>hudson.model.Run.Update:hudson-admin</permission>
+    <permission>hudson.model.View.Configure:hudson-admin</permission>
+    <permission>hudson.model.View.Create:hudson-admin</permission>
+    <permission>hudson.model.View.Delete:hudson-admin</permission>
+    <permission>hudson.model.View.Read:anonymous</permission>
+    <permission>hudson.model.View.Read:hudson-admin</permission>
+    <permission>hudson.model.View.Read:hudson-pcv</permission>
+    <permission>hudson.model.View.Read:hudson-release</permission>
+    <permission>hudson.scm.SCM.Tag:hudson-admin</permission>
+    <permission>org.jenkins.plugins.lockableresources.LockableResourcesManager.Reserve:hudson-admin</permission>
+    <permission>org.jenkins.plugins.lockableresources.LockableResourcesManager.Unlock:hudson-admin</permission>
+  </authorizationStrategy>
+  <securityRealm class="hudson.plugins.active_directory.ActiveDirectorySecurityRealm" plugin="active-directory@2.10">
+    <startTls>true</startTls>
+    <groupLookupStrategy>AUTO</groupLookupStrategy>
+    <removeIrrelevantGroups>false</removeIrrelevantGroups>
+    <tlsConfiguration>TRUST_ALL_CERTIFICATES</tlsConfiguration>
+  </securityRealm>
+  <disableRememberMe>false</disableRememberMe>
+  <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
+  <workspaceDir>D:/Jenkins/workspace/${ITEM_FULLNAME}</workspaceDir>
+  <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
+  <systemMessage>Production Jenkins build server running on NXT-BUILD10 ...</systemMessage>
+  <markupFormatter class="hudson.markup.RawHtmlMarkupFormatter" plugin="antisamy-markup-formatter@1.5">
+    <disableSyntaxHighlighting>false</disableSyntaxHighlighting>
+  </markupFormatter>
+  <jdks/>
+  <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
+  <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
+  <clouds/>
+  <quietPeriod>5</quietPeriod>
+  <scmCheckoutRetryCount>0</scmCheckoutRetryCount>
+  <views>
+    <hudson.model.AllView>
+      <owner class="hudson" reference="../../.."/>
+      <name>All</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+    </hudson.model.AllView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>misc</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>source_devops-aws-scripts</string>
+        <string>source_external</string>
+        <string>source_git_external</string>
+        <string>source_main_external</string>
+        <string>test_email</string>
+        <string>test_sync</string>
+        <string>upload2S3_test_sync</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+      </columns>
+      <recurse>false</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>Plugins</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>release_plugins_SAP_GRC</string>
+        <string>release_plugins_SAP_Jco</string>
+        <string>release_plugins_SAP_Jco_RM</string>
+        <string>release_plugins_SAP_JCo_RM_1.0_NonNXL</string>
+        <string>release_plugins_SAP_Jco_RM_2.0</string>
+        <string>release_plugins_SAP_JCo_RM_2.0_NonNXL</string>
+        <string>release_plugins_userattributesprovider</string>
+        <string>release_plugins_userattributesprovider_BAE_7.1</string>
+        <string>release_plugins_userattributesprovider_BAE_7.5</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.plugins.git.GitBranchSpecifierColumn plugin="git@3.9.1"/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+      </columns>
+      <recurse>false</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>9.0_OnPrem</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>artifactory-publisher</string>
+        <string>destiny-dbscripts-9.0</string>
+        <string>destiny-Nimbus-8.1.2-help-SaaS</string>
+        <string>destiny-Nimbus-9.0-help-OnPremise</string>
+        <string>pcv_CC_Nimbus_9.0_CC-1151_base</string>
+        <string>pcv_CC_Nimbus_9.0_CC-1151_installer</string>
+        <string>pcv_CC_Nimbus_9.0_CC-1151_serverapps</string>
+        <string>pcv_CC_Nimbus_9.0_IntegrationMain_base</string>
+        <string>pcv_CC_Nimbus_9.0_IntegrationMain_serverapps</string>
+        <string>pcv_CC_Nimbus_9.0_Z_IntegrationMain_installer</string>
+        <string>source_destiny-openaz-nodejs_Nimbus_release_8.7.0</string>
+        <string>source_destiny-ui_Nimbus_OnPremise</string>
+        <string>source_destiny-ui_Nimbus_OnPremise_9.0</string>
+        <string>source_external</string>
+        <string>source_git_external</string>
+        <string>source_main_external</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.plugins.git.GitBranchSpecifierColumn plugin="git@3.9.1"/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+      </columns>
+      <recurse>false</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>8.6.2_AzureOnlySaaS</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>destiny-Nimbus-8.1.2-help-SaaS</string>
+        <string>destiny-Nimbus-8.6-help-OnPremise</string>
+        <string>pcv_CC_Nimbus_8.6.2.100_OnPrem_UI_Inv_serverapps</string>
+        <string>pcv_CC_Nimbus_8.6.2.100_OnPrem_UI_Inv_Z_installer</string>
+        <string>pcv_CC_Nimbus_8.6.2_IntegrationMain_base</string>
+        <string>pcv_CC_Nimbus_8.6.2_IntegrationMain_serverapps</string>
+        <string>pcv_CC_Nimbus_8.6.2_Z_IntegrationMain_installer</string>
+        <string>source_destiny-ui_Nimbus_saas</string>
+        <string>source_external</string>
+        <string>source_git_external</string>
+        <string>source_main_external</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.plugins.git.GitBranchSpecifierColumn plugin="git@3.9.1"/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+      </columns>
+      <recurse>false</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>8.7_OnPrem</name>
+      <description>View for Nimbus 8.7 jobs</description>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>destiny-Nimbus-8.6.4-help-SaaS</string>
+        <string>destiny-Nimbus-8.7-help-OnPremise</string>
+        <string>pcv_CC_Nimbus_8.7_IntegrationMain_base</string>
+        <string>pcv_CC_Nimbus_8.7_IntegrationMain_installer</string>
+        <string>pcv_CC_Nimbus_8.7_IntegrationMain_serverapps</string>
+        <string>release_ControlCenter_8.7_Base</string>
+        <string>release_ControlCenter_8.7_Installer</string>
+        <string>release_ControlCenter_8.7_Serverapps</string>
+        <string>source_destiny-openaz-nodejs_Nimbus_release_8.7.0</string>
+        <string>source_destiny-ui_Nimbus_OnPremise_8.7</string>
+        <string>source_external</string>
+        <string>source_git_external</string>
+        <string>source_main_external</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.plugins.git.GitBranchSpecifierColumn plugin="git@3.9.1"/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+      </columns>
+      <recurse>false</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>8.6.4.1_SaaS</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>deploy_production_cloudaz_8.6.4.1_help</string>
+        <string>deploy_staging_cloudaz_8.6.4.1_help</string>
+        <string>destiny-Nimbus-8.6-help-OnPremise</string>
+        <string>destiny-Nimbus-8.6.4-help-SaaS</string>
+        <string>destiny-Nimbus-8.6.4.1-help-SaaS</string>
+        <string>release_ControlCenter_8.6.4.1_Base</string>
+        <string>release_ControlCenter_8.6.4.1_Installer</string>
+        <string>release_ControlCenter_8.6.4.1_ServerApps</string>
+        <string>source_destiny-ui_Nimbus_saas</string>
+        <string>source_external</string>
+        <string>source_git_external</string>
+        <string>source_main_external</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.BuildButtonColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.plugins.git.GitBranchSpecifierColumn plugin="git@3.9.1"/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+      </columns>
+      <recurse>false</recurse>
+    </listView>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name>8.7.2_OnPrem</name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames>
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+        <string>destiny-Nimbus-8.7-help-OnPremise</string>
+        <string>pcv_CC_Nimbus_8.7.2_IntegrationMain_base</string>
+        <string>pcv_CC_Nimbus_8.7.2_IntegrationMain_installer</string>
+        <string>pcv_CC_Nimbus_8.7.2_IntegrationMain_serverapps</string>
+        <string>source_destiny-openaz-nodejs_Nimbus_release_8.7.0</string>
+        <string>source_destiny-ui_Nimbus_OnPremise_8.7</string>
+        <string>source_external</string>
+        <string>source_git_external</string>
+        <string>source_main_external</string>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <recurse>false</recurse>
+    </listView>
+  </views>
+  <primaryView>9.0_OnPrem</primaryView>
+  <slaveAgentPort>-1</slaveAgentPort>
+  <label></label>
+  <crumbIssuer class="hudson.security.csrf.DefaultCrumbIssuer">
+    <excludeClientIPFromCrumb>false</excludeClientIPFromCrumb>
+  </crumbIssuer>
+  <nodeProperties>
+    <hudson.slaves.EnvironmentVariablesNodeProperty>
+      <envVars serialization="custom">
+        <unserializable-parents/>
+        <tree-map>
+          <default>
+            <comparator class="hudson.util.CaseInsensitiveComparator"/>
+          </default>
+          <int>2</int>
+          <string>STAGING_AWS_ACCESS_KEY_ID</string>
+          <string>AKIAIOFXSSV4FBPLJJAQ</string>
+          <string>STAGING_AWS_SECRET_ACCESS_KEY</string>
+          <string>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</string>
+        </tree-map>
+      </envVars>
+    </hudson.slaves.EnvironmentVariablesNodeProperty>
+  </nodeProperties>
+  <globalNodeProperties>
+    <hudson.plugins.zentimestamp.ZenTimestampNodeProperty plugin="zentimestamp@4.2">
+      <pattern>yyyy-MM-dd_HH-mm-ss</pattern>
+    </hudson.plugins.zentimestamp.ZenTimestampNodeProperty>
+    <hudson.slaves.EnvironmentVariablesNodeProperty>
+      <envVars serialization="custom">
+        <unserializable-parents/>
+        <tree-map>
+          <default>
+            <comparator class="hudson.util.CaseInsensitiveComparator"/>
+          </default>
+          <int>1</int>
+          <string>HOME</string>
+          <string>C:\cygwin64\home\build-op</string>
+        </tree-map>
+      </envVars>
+    </hudson.slaves.EnvironmentVariablesNodeProperty>
+    <hudson.tools.ToolLocationNodeProperty>
+      <locations>
+        <hudson.tools.ToolLocationNodeProperty_-ToolLocation>
+          <type>hudson.plugins.git.GitTool$DescriptorImpl</type>
+          <name>Default</name>
+          <home>C:\Git\cmd\git.exe</home>
+        </hudson.tools.ToolLocationNodeProperty_-ToolLocation>
+      </locations>
+    </hudson.tools.ToolLocationNodeProperty>
+  </globalNodeProperties>
+</hudson>

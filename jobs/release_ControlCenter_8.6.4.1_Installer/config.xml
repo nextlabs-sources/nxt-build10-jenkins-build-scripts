@@ -1,0 +1,258 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Release build of ControlCenter Nimbus_8.6.4.1 - Generate Installer&#xd;
+&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;- &lt;b&gt;repo&lt;/b&gt;: https://bitbucket.org/nxtlbs-devops/destiny-installer&#xd;
+&lt;br&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;- &lt;b&gt;branch&lt;/b&gt;: origin/saas/nimbus/8.6.4/release/release-8.6.4.1</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>10</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <hudson.plugins.disk__usage.DiskUsageProperty plugin="disk-usage@0.28"/>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM" plugin="git@3.9.1">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <url>git@bitbucket.org:nxtlbs-devops/destiny-installer.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>origin/saas/nimbus/8.6.4/release/release-8.6.4.1</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <submoduleCfg class="list"/>
+    <extensions>
+      <hudson.plugins.git.extensions.impl.CleanBeforeCheckout/>
+      <hudson.plugins.git.extensions.impl.PruneStaleBranch/>
+    </extensions>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>true</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers>
+    <jenkins.triggers.ReverseBuildTrigger>
+      <spec></spec>
+      <upstreamProjects>release_ControlCenter_8.6.4.1_ServerApps</upstreamProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+        <completeBuild>true</completeBuild>
+      </threshold>
+    </jenkins.triggers.ReverseBuildTrigger>
+  </triggers>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>set +x
+export NLEXTERNALDIR=D:/P4/external
+export NLEXTERNALDIR2=D:/P4/main_external
+export JAVA_HOME=$NLEXTERNALDIR2/j2sdk/jdk1.8.0_161
+
+export DESTINY_OPENAZ_NODEJS_SRC_TREE_ROOT=D:/Jenkins/workspace/source_destiny-openaz-nodejs_Nimbus_release_8.5.0
+export DESTINY_UI_SRC_TREE_ROOT=D:/Jenkins/workspace/source_destiny-ui_Nimbus_SaaS
+export TECHPUBS_HELP_ROOT=D:/Jenkins/workspace/destiny-Nimbus-8.6.4-help-SaaS
+
+set +x
+echo &quot;################################################################################&quot;
+echo &quot;INFO: Git info about current state of DESTINY_OPENAZ_NODEJS_SRC_TREE_ROOT&quot;
+echo &quot;INFO: DESTINY_OPENAZ_NODEJS_SRC_TREE_ROOT is ${DESTINY_OPENAZ_NODEJS_SRC_TREE_ROOT}&quot;
+cd ${DESTINY_OPENAZ_NODEJS_SRC_TREE_ROOT}/
+git show --quiet --no-patch HEAD
+echo &quot;################################################################################&quot;
+
+echo &quot;################################################################################&quot;
+echo &quot;INFO: Git info about current state of DESTINY_UI_SRC_TREE_ROOT&quot;
+echo &quot;INFO: DESTINY_UI_SRC_TREE_ROOT is ${DESTINY_UI_SRC_TREE_ROOT}&quot;
+cd ${DESTINY_UI_SRC_TREE_ROOT}/
+git show --quiet --no-patch HEAD
+echo &quot;################################################################################&quot;
+
+echo &quot;################################################################################&quot;
+echo &quot;INFO: Git info about current state of TECHPUBS_HELP_ROOT&quot;
+echo &quot;INFO: TECHPUBS_HELP_ROOT is ${TECHPUBS_HELP_ROOT}&quot;
+cd ${TECHPUBS_HELP_ROOT}/
+git show --quiet --no-patch HEAD
+echo &quot;################################################################################&quot;
+set -x
+
+cd ${WORKSPACE}/
+source ./setEnv
+./buildRelease
+
+awk &apos;/VERSION_BUILD_SHORT=/{print $2}&apos; build.config &gt; ${WORKSPACE}/upload2s3.properties
+awk &apos;/VERSION_STR=/{print $2}&apos;  build.config &gt;&gt; ${WORKSPACE}/upload2s3.properties
+echo
+echo &quot;################################################################################&quot;
+echo &quot;INFO: Contents of upload2s3.properties&quot;
+cat ${WORKSPACE}/upload2s3.properties
+echo &quot;################################################################################&quot;
+echo</command>
+    </hudson.tasks.Shell>
+    <hudson.plugins.descriptionsetter.DescriptionSetterBuilder plugin="description-setter@1.10">
+      <regexp>^Checking out Revision (\w{7})</regexp>
+      <description>GitSHA: \1</description>
+    </hudson.plugins.descriptionsetter.DescriptionSetterBuilder>
+  </builders>
+  <publishers>
+    <org.jenkinsci.plugins.postbuildscript.PostBuildScript plugin="postbuildscript@2.8.1">
+      <config>
+        <scriptFiles/>
+        <groovyScripts/>
+        <buildSteps>
+          <org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+            <results>
+              <string>SUCCESS</string>
+            </results>
+            <role>BOTH</role>
+            <executeOn>BOTH</executeOn>
+            <buildSteps>
+              <hudson.tasks.Shell>
+                <command>set +x
+export AWS_ACCESS_KEY_ID=${STAGING_AWS_ACCESS_KEY_ID} # STAGING_AWS_ACCESS_KEY_ID defined in Jenkins properties
+export AWS_SECRET_ACCESS_KEY=&quot;${STAGING_AWS_SECRET_ACCESS_KEY}&quot; # STAGING_AWS_SECRET_ACCESS_KEY defined in Jenkins properties
+
+export DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT=D:/Jenkins/workspace/source_devops-aws-scripts
+
+RETRY_COUNT=5 # Number of retry attempts to push package to S3
+OVERALL_UPLOAD_STATUS=0 # Overall status of upload of all packages
+BUCKET=nextlabs-rc
+PKG_DIR=$(cygpath --mixed ${WORKSPACE})
+
+VERSION_BUILD_SHORT=$(awk -F&apos;=&apos; &apos;/VERSION_BUILD_SHORT/{print $2}&apos; ${PKG_DIR}/upload2s3.properties)
+VERSION_STR=$(awk -F&apos;=&apos; &apos;/VERSION_STR/{print $2}&apos; ${PKG_DIR}/upload2s3.properties)
+
+echo &quot;INFO: VERSION_BUILD_SHORT: ${VERSION_BUILD_SHORT}&quot;
+echo &quot;INFO: VERSION_STR: ${VERSION_STR}&quot;
+
+echo
+echo &quot;################################################################################&quot;
+echo &quot;INFO: Archives to upload in ${PKG_DIR}/build&quot;
+echo &quot;################################################################################&quot;
+ls -l &quot;${PKG_DIR}&quot;/build/*.zip
+echo &quot;################################################################################&quot;
+echo
+
+echo
+echo &quot;################################################################################&quot;
+echo &quot;INFO: Contents of upload2s3.properties&quot;
+cat ${PKG_DIR}/upload2s3.properties
+echo &quot;################################################################################&quot;
+echo
+
+##
+# Usage: checkPackageInS3 INSTALLER UPLOADPATH
+##
+checkPackageInS3 () {
+	INSTALLER=$1
+	UPLOADPATH=$2
+	PKGCOUNT=$(aws s3 ls s3://${BUCKET}/nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT}/${INSTALLER} | wc -l)
+	if [ ${PKGCOUNT} -ne 1 ] ; then
+		echo &quot;ERROR: checkPackageInS3(): Upload of ${INSTALLER} package failed.&quot;
+		OVERALL_UPLOAD_STATUS=-1
+	fi
+}
+##
+################################################################################
+
+if compgen -G &quot;${PKG_DIR}/build/ControlCenter-Linux-chef-SaaS-${VERSION_STR}*.zip&quot; &gt; /dev/null; then
+	FP2_CC_LINUX_CHEF_INSTALLER=$(ls ${PKG_DIR}/build/ControlCenter-Linux-chef-SaaS-${VERSION_STR}*.zip)
+	CC_LINUX_CHEF_INSTALLER=$(basename ${FP2_CC_LINUX_CHEF_INSTALLER})
+	UPLOADPATH=Platform
+
+	echo &quot;INFO: Uploading $(basename ${FP2_CC_LINUX_CHEF_INSTALLER}) to s3://${BUCKET}/nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT}/&quot;
+	echo python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_CC_LINUX_CHEF_INSTALLER} numtry=${RETRY_COUNT}
+	python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_CC_LINUX_CHEF_INSTALLER} numtry=${RETRY_COUNT} &amp;
+fi
+
+# if compgen -G &quot;${PKG_DIR}/build/ControlCenter-Linux-chef-${VERSION_STR}*.zip&quot; &gt; /dev/null; then
+# 	FP2_CC_LINUX_CHEF_ONPREMISE_INSTALLER=$(ls ${PKG_DIR}/build/ControlCenter-Linux-chef-${VERSION_STR}*.zip)
+# 	CC_LINUX_CHEF_ONPREMISE_INSTALLER=$(basename ${FP2_CC_LINUX_CHEF_ONPREMISE_INSTALLER})
+# 	UPLOADPATH=Platform
+
+# 	# Upload the package to S3
+# 	echo &quot;INFO: Uploading $(basename ${FP2_CC_LINUX_CHEF_ONPREMISE_INSTALLER}) to s3://${BUCKET}/nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT}/&quot;
+# 	echo python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_CC_LINUX_CHEF_ONPREMISE_INSTALLER} numtry=${RETRY_COUNT}
+# 	python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_CC_LINUX_CHEF_ONPREMISE_INSTALLER} numtry=${RETRY_COUNT} &amp;
+# fi
+
+# if compgen -G &quot;${PKG_DIR}/build/ControlCenter-Windows-chef-${VERSION_STR}*.zip&quot; &gt; /dev/null; then
+# 	FP2_CC_WINDOWS_CHEF_INSTALLER=$(ls ${PKG_DIR}/build/ControlCenter-Windows-chef-${VERSION_STR}*.zip)
+# 	CC_WINDOWS_CHEF_INSTALLER=$(basename ${FP2_CC_WINDOWS_CHEF_INSTALLER})
+# 	UPLOADPATH=Platform
+
+# 	# Upload the package to S3
+# 	echo &quot;INFO: Uploading $(basename ${FP2_CC_WINDOWS_CHEF_INSTALLER}) to s3://${BUCKET}/nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT}/&quot;
+# 	echo python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_CC_WINDOWS_CHEF_INSTALLER} numtry=${RETRY_COUNT}
+# 	python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_CC_WINDOWS_CHEF_INSTALLER} numtry=${RETRY_COUNT} &amp;
+# fi
+
+if compgen -G &quot;${PKG_DIR}/build/PolicyControllerJava-chef-${VERSION_STR}*.zip&quot; &gt; /dev/null; then
+	FP2_JPC_LINUX_CHEF_INSTALLER=$(ls ${PKG_DIR}/build/PolicyControllerJava-chef-${VERSION_STR}*.zip)
+	JPC_LINUX_CHEF_INSTALLER=$(basename ${FP2_JPC_LINUX_CHEF_INSTALLER})
+	UPLOADPATH=PolicyControllerJava
+
+	# Upload the package to S3
+	echo &quot;INFO: Uploading $(basename ${FP2_JPC_LINUX_CHEF_INSTALLER}) to s3://${BUCKET}/nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT}/&quot;
+	echo python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_JPC_LINUX_CHEF_INSTALLER} numtry=${RETRY_COUNT}
+	python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_JPC_LINUX_CHEF_INSTALLER} numtry=${RETRY_COUNT} &amp;
+fi
+
+# if compgen -G &quot;${PKG_DIR}/build/Nextlabs-OpenAZ-PEP-${VERSION_STR}*.zip&quot; &gt; /dev/null; then
+# 	FP2_OPENAZPEP_INSTALLER=$(ls ${PKG_DIR}/build/Nextlabs-OpenAZ-PEP-${VERSION_STR}*.zip)
+# 	OPENAZPEP_INSTALLER=$(basename ${FP2_OPENAZPEP_INSTALLER})
+# 	UPLOADPATH=Platform
+
+# 	# Upload the package to S3
+# 	echo &quot;INFO: Uploading $(basename ${FP2_OPENAZPEP_INSTALLER}) to s3://${BUCKET}/nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT}/&quot;
+# 	echo python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_OPENAZPEP_INSTALLER} numtry=${RETRY_COUNT}
+# 	python ${DEVOPS_AWS_SCRIPTS_SRC_TREE_ROOT}/build-scripts/s3upload.py bucket=${BUCKET} s3path=nextlabs-share/${UPLOADPATH}/${VERSION_STR}/${VERSION_BUILD_SHORT} file=${FP2_OPENAZPEP_INSTALLER} numtry=${RETRY_COUNT} &amp;
+# fi
+
+wait
+
+checkPackageInS3 ${CC_LINUX_CHEF_INSTALLER} Platform
+# checkPackageInS3 ${CC_LINUX_CHEF_ONPREMISE_INSTALLER} Platform
+# checkPackageInS3 ${CC_WINDOWS_CHEF_INSTALLER} Platform
+checkPackageInS3 ${JPC_LINUX_CHEF_INSTALLER} PolicyControllerJava
+# checkPackageInS3 ${OPENAZPEP_INSTALLER} Platform
+
+# Final cleanup
+rm -f ${FP2_CC_LINUX_CHEF_INSTALLER}
+# rm -f ${FP2_CC_LINUX_CHEF_ONPREMISE_INSTALLER}
+# rm -f ${FP2_CC_WINDOWS_CHEF_INSTALLER}
+rm -f ${FP2_JPC_LINUX_CHEF_INSTALLER}
+# rm -f ${FP2_OPENAZPEP_INSTALLER}
+# rm -f ${PKG_DIR}/upload2s3.properties
+
+exit ${OVERALL_UPLOAD_STATUS}
+
+## EOF ##
+</command>
+              </hudson.tasks.Shell>
+            </buildSteps>
+          </org.jenkinsci.plugins.postbuildscript.model.PostBuildStep>
+        </buildSteps>
+        <markBuildUnstable>false</markBuildUnstable>
+      </config>
+    </org.jenkinsci.plugins.postbuildscript.PostBuildScript>
+    <hudson.tasks.Mailer plugin="mailer@1.21">
+      <recipients>hudson-build@nextlabs.com Alan.Morgan@nextlabs.com ShahNeng.Chok@nextlabs.com Sneha.Tilak@nextlabs.com Moushumi.Seal@nextlabs.com Sachindra.Kahawitage@nextlabs.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.10"/>
+  </buildWrappers>
+</project>

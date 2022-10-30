@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <jenkins.model.BuildDiscarderProperty>
+      <strategy class="hudson.tasks.LogRotator">
+        <daysToKeep>-1</daysToKeep>
+        <numToKeep>5</numToKeep>
+        <artifactDaysToKeep>-1</artifactDaysToKeep>
+        <artifactNumToKeep>-1</artifactNumToKeep>
+      </strategy>
+    </jenkins.model.BuildDiscarderProperty>
+    <hudson.plugins.disk__usage.DiskUsageProperty plugin="disk-usage@0.28"/>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>echo &quot;VERSION_BUILD_SHORT=13PS-Main&quot; &gt; upload2s3.properties
+echo &quot;VERSION_STR=8.0.4.999&quot; &gt;&gt; upload2s3.properties
+
+cat upload2s3.properties
+
+echo &quot;ControlCenter-Linux-chef-SaaS-8.0.4.999-13PS-Main.zip&quot; &gt; ControlCenter-Linux-chef-SaaS-8.0.4.999-13PS-Main.zip
+echo &quot;ControlCenter-Linux-chef-8.0.4.999-13PS-Main.zip&quot; &gt; ControlCenter-Linux-chef-8.0.4.999-13PS-Main.zip
+echo &quot;ControlCenter-Windows-chef-8.0.4.999-13PS-Main.zip&quot; &gt; ControlCenter-Windows-chef-8.0.4.999-13PS-Main.zip
+echo &quot;PolicyControllerJava-chef-8.0.4.999-12.zip&quot; &gt; PolicyControllerJava-chef-8.0.4.999-12.zip
+echo &quot;Nextlabs-OpenAZ-PEP-8.0.4.999-12.zip&quot; &gt; Nextlabs-OpenAZ-PEP-8.0.4.999-12.zip</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <jenkins.plugins.publish__over__ssh.BapSshPublisherPlugin plugin="publish-over-ssh@1.14">
+      <consolePrefix>SSH: </consolePrefix>
+      <delegate>
+        <publishers>
+          <jenkins.plugins.publish__over__ssh.BapSshPublisher>
+            <configName>NXT-BUILD23</configName>
+            <verbose>false</verbose>
+            <transfers>
+              <jenkins.plugins.publish__over__ssh.BapSshTransfer>
+                <remoteDirectory>${JOB_NAME}</remoteDirectory>
+                <sourceFiles>upload2s3.properties,ControlCenter-*-chef-*.zip,PolicyControllerJava-chef-*.zip,Nextlabs-OpenAZ-PEP-*.zip</sourceFiles>
+                <excludes></excludes>
+                <removePrefix></removePrefix>
+                <remoteDirectorySDF>false</remoteDirectorySDF>
+                <flatten>false</flatten>
+                <cleanRemote>false</cleanRemote>
+                <noDefaultExcludes>false</noDefaultExcludes>
+                <makeEmptyDirs>false</makeEmptyDirs>
+                <patternSeparator>[, ]+</patternSeparator>
+                <execCommand></execCommand>
+                <execTimeout>120000</execTimeout>
+                <usePty>false</usePty>
+              </jenkins.plugins.publish__over__ssh.BapSshTransfer>
+            </transfers>
+            <useWorkspaceInPromotion>false</useWorkspaceInPromotion>
+            <usePromotionTimestamp>false</usePromotionTimestamp>
+          </jenkins.plugins.publish__over__ssh.BapSshPublisher>
+        </publishers>
+        <continueOnError>false</continueOnError>
+        <failOnError>false</failOnError>
+        <alwaysPublishFromMaster>false</alwaysPublishFromMaster>
+        <hostConfigurationAccess class="jenkins.plugins.publish_over_ssh.BapSshPublisherPlugin" reference="../.."/>
+      </delegate>
+    </jenkins.plugins.publish__over__ssh.BapSshPublisherPlugin>
+    <hudson.tasks.BuildTrigger>
+      <childProjects>upload2S3_test_sync</childProjects>
+      <threshold>
+        <name>SUCCESS</name>
+        <ordinal>0</ordinal>
+        <color>BLUE</color>
+        <completeBuild>true</completeBuild>
+      </threshold>
+    </hudson.tasks.BuildTrigger>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.7"/>
+  </buildWrappers>
+</project>

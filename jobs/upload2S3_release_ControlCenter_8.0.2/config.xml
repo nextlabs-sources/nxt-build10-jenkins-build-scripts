@@ -1,0 +1,103 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.disk__usage.DiskUsageProperty plugin="disk-usage@0.28"/>
+  </properties>
+  <scm class="hudson.scm.NullSCM"/>
+  <assignedNode>S3Upload</assignedNode>
+  <canRoam>false</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>set +x
+export AWS_ACCESS_KEY_ID=${STAGING_AWS_ACCESS_KEY_ID}
+export AWS_SECRET_ACCESS_KEY=&quot;${STAGING_AWS_SECRET_ACCESS_KEY}&quot;
+
+PKG_BUCKET=$(echo ${JOB_NAME} | sed &apos;s@^upload2S3_@@&apos;)
+echo &quot;INFO: PKG_BUCKET: ${PKG_BUCKET}&quot;
+PKG_DIR=/usr/jenkins/${PKG_BUCKET}
+
+echo
+echo &quot;################################################################################&quot;
+echo &quot;INFO: Contents of ${PKG_DIR}&quot;
+echo &quot;################################################################################&quot;
+ls -l ${PKG_DIR}
+echo &quot;################################################################################&quot;
+echo
+
+if compgen -G &quot;${PKG_DIR}/ControlCenter-Linux-chef-SaaS-*&quot; &gt; /dev/null; then
+	FP2_CC_LINUX_CHEF_INSTALLER=$(ls -t ${PKG_DIR}/ControlCenter-Linux-chef-SaaS-* | head -1)
+	CC_LINUX_CHEF_INSTALLER=$(basename ${FP2_CC_LINUX_CHEF_INSTALLER})
+	CC_LINUX_CHEF_INSTALLER_VERSION=$(echo ${CC_LINUX_CHEF_INSTALLER} | awk -F&apos;-&apos; &apos;{print $5}&apos;)
+
+	echo &quot;INFO: Uploading ${CC_LINUX_CHEF_INSTALLER} to s3://nextlabspcv/nextlabs-share/Platform/${CC_LINUX_CHEF_INSTALLER_VERSION}/${CC_LINUX_CHEF_INSTALLER}...&quot;
+	echo time aws s3 cp ${FP2_CC_LINUX_CHEF_INSTALLER} s3://nextlabspcv/nextlabs-share/Platform/${CC_LINUX_CHEF_INSTALLER_VERSION}/${CC_LINUX_CHEF_INSTALLER}
+	time aws s3 cp ${FP2_CC_LINUX_CHEF_INSTALLER} s3://nextlabspcv/nextlabs-share/Platform/${CC_LINUX_CHEF_INSTALLER_VERSION}/${CC_LINUX_CHEF_INSTALLER} &amp;
+fi
+
+if compgen -G &quot;${PKG_DIR}/ControlCenter-Linux-chef-*&quot; | grep -v SaaS &gt; /dev/null; then
+	FP2_CC_LINUX_CHEF_ONPREMISE_INSTALLER=$(ls -t ${PKG_DIR}/ControlCenter-Linux-chef-* | grep -v SaaS | head -1)
+	CC_LINUX_CHEF_ONPREMISE_INSTALLER=$(basename ${FP2_CC_LINUX_CHEF_ONPREMISE_INSTALLER})
+	CC_LINUX_CHEF_ONPREMISE_INSTALLER_VERSION=$(echo ${CC_LINUX_CHEF_ONPREMISE_INSTALLER} | awk -F&apos;-&apos; &apos;{print $5}&apos;)
+
+	echo &quot;INFO: Uploading ${CC_LINUX_CHEF_ONPREMISE_INSTALLER} to s3://nextlabspcv/nextlabs-share/Platform/${CC_LINUX_CHEF_ONPREMISE_INSTALLER_VERSION}/${CC_LINUX_CHEF_ONPREMISE_INSTALLER}...&quot;
+	echo time aws s3 cp ${FP2_CC_LINUX_CHEF_ONPREMISE_INSTALLER} s3://nextlabspcv/nextlabs-share/Platform/${CC_LINUX_CHEF_ONPREMISE_INSTALLER_VERSION}/${CC_LINUX_CHEF_ONPREMISE_INSTALLER}
+	time aws s3 cp ${FP2_CC_LINUX_CHEF_ONPREMISE_INSTALLER} s3://nextlabspcv/nextlabs-share/Platform/${CC_LINUX_CHEF_ONPREMISE_INSTALLER_VERSION}/${CC_LINUX_CHEF_ONPREMISE_INSTALLER} &amp;
+fi
+
+if compgen -G &quot;${PKG_DIR}/ControlCenter-Windows-chef-*&quot; &gt; /dev/null; then
+	FP2_CC_WINDOWS_CHEF_INSTALLER=$(ls -t ${PKG_DIR}/ControlCenter-Windows-chef-* | head -1)
+	CC_WINDOWS_CHEF_INSTALLER=$(basename ${FP2_CC_WINDOWS_CHEF_INSTALLER})
+	CC_WINDOWS_CHEF_INSTALLER_VERSION=$(echo ${CC_WINDOWS_CHEF_INSTALLER} | awk -F&apos;-&apos; &apos;{print $5}&apos;)
+
+	echo &quot;INFO: Uploading ${CC_WINDOWS_CHEF_INSTALLER} to s3://nextlabspcv/nextlabs-share/Platform/${CC_WINDOWS_CHEF_INSTALLER_VERSION}/${CC_WINDOWS_CHEF_INSTALLER}...&quot;
+	echo time aws s3 cp ${FP2_CC_WINDOWS_CHEF_INSTALLER} s3://nextlabspcv/nextlabs-share/Platform/${CC_WINDOWS_CHEF_INSTALLER_VERSION}/${CC_WINDOWS_CHEF_INSTALLER}
+	time aws s3 cp ${FP2_CC_WINDOWS_CHEF_INSTALLER} s3://nextlabspcv/nextlabs-share/Platform/${CC_WINDOWS_CHEF_INSTALLER_VERSION}/${CC_WINDOWS_CHEF_INSTALLER} &amp;
+fi
+
+if compgen -G &quot;${PKG_DIR}/PolicyControllerJava-chef-*&quot; &gt; /dev/null; then
+	FP2_JPC_LINUX_CHEF_INSTALLER=$(ls -t ${PKG_DIR}/PolicyControllerJava-chef-* | head -1)
+	JPC_LINUX_CHEF_INSTALLER=$(basename ${FP2_JPC_LINUX_CHEF_INSTALLER})
+	JPC_LINUX_CHEF_INSTALLER_VERSION=$(echo ${JPC_LINUX_CHEF_INSTALLER} | awk -F&apos;-&apos; &apos;{print $3}&apos;)
+
+	echo &quot;INFO: Uploading ${JPC_LINUX_CHEF_INSTALLER} to s3://nextlabspcv/nextlabs-share/Platform/${JPC_LINUX_CHEF_INSTALLER_VERSION}/${JPC_LINUX_CHEF_INSTALLER}...&quot;
+	echo time aws s3 cp ${FP2_JPC_LINUX_CHEF_INSTALLER} s3://nextlabspcv/nextlabs-share/PolicyControllerJava/${JPC_LINUX_CHEF_INSTALLER_VERSION}/${JPC_LINUX_CHEF_INSTALLER}
+	time aws s3 cp ${FP2_JPC_LINUX_CHEF_INSTALLER} s3://nextlabspcv/nextlabs-share/PolicyControllerJava/${JPC_LINUX_CHEF_INSTALLER_VERSION}/${JPC_LINUX_CHEF_INSTALLER} &amp;
+fi
+
+if compgen -G &quot;${PKG_DIR}/Nextlabs-OpenAZ-PEP-*.zip&quot; &gt; /dev/null; then
+	FP2_OPENAZPEP_INSTALLER=$(ls -t ${PKG_DIR}/Nextlabs-OpenAZ-PEP-*.zip | head -1)
+	OPENAZPEP_INSTALLER=$(basename ${FP2_OPENAZPEP_INSTALLER})
+	OPENAZPEP_INSTALLER_VERSION=$(echo ${OPENAZPEP_INSTALLER} | awk -F&apos;-&apos; &apos;{print $4}&apos;)
+
+	echo &quot;INFO: Uploading ${OPENAZPEP_INSTALLER} to s3://nextlabspcv/nextlabs-share/Platform/${OPENAZPEP_INSTALLER_VERSION}/${OPENAZPEP_INSTALLER}...&quot;
+	echo time aws s3 cp ${FP2_OPENAZPEP_INSTALLER} s3://nextlabspcv/nextlabs-share/Platform/${OPENAZPEP_INSTALLER_VERSION}/${OPENAZPEP_INSTALLER}
+	time aws s3 cp ${FP2_OPENAZPEP_INSTALLER} s3://nextlabspcv/nextlabs-share/Platform/${OPENAZPEP_INSTALLER_VERSION}/${OPENAZPEP_INSTALLER} &amp;
+fi
+
+wait
+
+rm -f ${PKG_DIR}/*
+
+## EOF ##
+</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.Mailer plugin="mailer@1.18">
+      <recipients>hudson-build@nextlabs.com lakshmi.krishnan@nextlabs.com Shiqiang.Duan@nextlabs.com Amila.Silva@nextlabs.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+  </publishers>
+  <buildWrappers>
+    <hudson.plugins.timestamper.TimestamperBuildWrapper plugin="timestamper@1.8.7"/>
+  </buildWrappers>
+</project>
